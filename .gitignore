@@ -3,3 +3,8 @@
 ################################################################################
 
 /src/UpWorkTask.BL/bin/Debug/net5.0
+/src/UpWorkTask.BL/obj
+/src/UpWorkTask.DAL/bin/Debug/net5.0
+/src/UpWorkTask.DAL/obj
+/src/UpWorkTask.DTO/obj
+/src/UpWorkTask.DTO/bin/Debug/net5.0

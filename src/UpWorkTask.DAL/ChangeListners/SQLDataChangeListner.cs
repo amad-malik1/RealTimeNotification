@@ -1,29 +1,33 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using TableDependency.SqlClient;
-using TableDependency.SqlClient.Base;
-using TableDependency.SqlClient.Base.Enums;
-using TableDependency.SqlClient.Base.EventArgs;
-using UpWorkTask.Data;
-using UpWorkTask.Models;
+using System.Collections.Generic;
 
 namespace UpWorkTask.BL
 {
-    public  class SQLDataChangeListner : IDataChangeListner
+    public class SQLDataChangeListner : IDataChangeListner
     {
+        public List<IDbChangeObserver> _observers { get; set; }
         public IConfiguration _configuration { get; set; }
         public SQLDataChangeListner(IConfiguration configuration)
         {
+            _observers = new List<IDbChangeObserver>();
             _configuration = configuration;
             SqlDependency.Start(_configuration.GetConnectionString("MyDbContext"));
+            RegisterListnerForEmployeeChanges();
         }
-        public void RegisterListnerForEmployeeChanges()
+
+        public void Attach(IDbChangeObserver dbChangeObserver)
+        {
+            _observers.Add(dbChangeObserver);
+        }
+
+        public void Detach(IDbChangeObserver dbChangeObserver)
+        {
+            _observers.Remove(dbChangeObserver);
+        }
+
+        void RegisterListnerForEmployeeChanges()
         {
             // Assume connection is an open SqlConnection.
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyDbContext")))
@@ -46,13 +50,12 @@ namespace UpWorkTask.BL
                         if (reader.HasRows)
                         {
                             reader.Read();
-                           var tmpdata = reader[0].ToString();
+                            var tmpdata = reader[0].ToString();
                         }
                     }
                 }
             }
         }
-
         void OnDependencyChange(object sender,
            SqlNotificationEventArgs e)
         {
@@ -61,13 +64,18 @@ namespace UpWorkTask.BL
             SqlDependency dependency = sender as SqlDependency;
             dependency.OnChange -= OnDependencyChange;
 
+            foreach (IDbChangeObserver observer in _observers)
+            {
+                observer.RefreshEmployeeData();
+            }
             RegisterListnerForEmployeeChanges();
         }
 
-       public void UnRegisterListnerForEmployeeChanges()
-        {
-            // Release the dependency.
-            SqlDependency.Stop(_configuration.GetConnectionString("MyDbContext"));
-        }
+        //void UnRegisterListnerForEmployeeChanges()
+        //{
+        //    // Release the dependency.
+        //    SqlDependency.Stop(_configuration.GetConnectionString("MyDbContext"));
+        //}
+
     }
 }

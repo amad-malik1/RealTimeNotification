@@ -10,8 +10,10 @@ using TableDependency.SqlClient.Base;
 using TableDependency.SqlClient.Base.Enums;
 using TableDependency.SqlClient.Base.EventArgs;
 using UpWorkTask.BL;
+using UpWorkTask.Controllers;
 using UpWorkTask.Data;
 using UpWorkTask.Models;
+using UpWorkTask.Observers;
 
 namespace UpWorkTask
 {
@@ -47,6 +49,8 @@ namespace UpWorkTask
             services.AddDbContext<MyDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("MyDbContext")));
             services.AddSingleton<IDataChangeListner, SQLDataChangeListner>();
+            services.AddSingleton<IDbChangeObserver, EmployeeDbChangeObserver>();
+            services.AddScoped<IEmployeesManager, EmployeesManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -58,8 +62,8 @@ namespace UpWorkTask
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "UpWork Task"));
             }
             var dataListner = app.ApplicationServices.GetService<IDataChangeListner>();
-
-            dataListner.RegisterListnerForEmployeeChanges();
+            var dbObserver = app.ApplicationServices.GetService<IDbChangeObserver>();
+            dataListner.Attach(dbObserver);
 
             app.UseRouting();
 
