@@ -16,7 +16,7 @@ namespace UpWorkTask.Observers
         public void RefreshEmployeeData()
         {
             CountTest.Count++;
-             _hubContext.Clients.All.BroadcastMessage();
+            _hubContext.Clients.All.BroadcastMessage();
         }
     }
 }

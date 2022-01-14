@@ -23,6 +23,7 @@ namespace UpWorkTask.Controllers
 
         // GET: api/Employees
         [HttpGet]
+        [Route("GetAll")]
         public async Task<IEnumerable<Employee>> GetEmployee()
         {
             return await _employeesManager.GetEmployee();
