@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChildren, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChildren, Input, Output, EventEmitter } from '@angular/core';
 import { FormControlName, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { EmployeeService } from '../employee.service';
 import { AppState } from 'src/app/app.state';
 import { Store } from '@ngrx/store';
 import { AddEmployee, GetAllEmployeesSuccess, GetEmployee, GetEmployeeSuccess, UpdateEmployee, UpdateEmployeeSuccess, UPDATE_EMPLOYEE_SUCCESS } from '../store/employees.actions';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-employee-edit',
@@ -30,7 +31,7 @@ export class EmployeeEditComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private employeeService: EmployeeService,
-     private store: Store<AppState>,) {
+     private store: Store<AppState>,public activeModal: NgbActiveModal) {
 
     this.validationMessages = {
       name: {
@@ -134,7 +135,8 @@ export class EmployeeEditComponent implements OnInit, OnDestroy {
             .subscribe(
               (emp) =>{
               //  this.store.dispatch(new UpdateEmployeeSuccess(  ));
-                this.onSaveComplete();},
+                this.onSaveComplete();
+              },
               (error: any) => this.errorMessage = <any>error
             );
         }
@@ -147,7 +149,11 @@ export class EmployeeEditComponent implements OnInit, OnDestroy {
   }
 
   onSaveComplete(): void {
+    this.activeModal.close();
     this.employeeForm.reset();
     this.router.navigate(['/employees']);
+  }
+  close() :void{
+    this.activeModal.close();
   }
 }  

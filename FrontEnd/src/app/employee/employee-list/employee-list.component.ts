@@ -93,7 +93,9 @@ export class EmployeeListComponent implements OnInit {
   OpeneditEmployeeModel(id) {
     const modalRef = this.modalService.open(EmployeeEditComponent, { size: 'xl' });
     modalRef.componentInstance.id = id;
-    
+    // modalRef.componentInstance.close.subscribe(result => {
+    // alert(111);
+    // });
   }
   private getDismissReason(reason: any): string {
     return `with: ${reason}`;
