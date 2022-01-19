@@ -32,7 +32,6 @@ export class EmployeeEditComponent implements OnInit, OnDestroy {
     private router: Router,
     private employeeService: EmployeeService,
      private store: Store<AppState>,public activeModal: NgbActiveModal) {
-
     this.validationMessages = {
       name: {
         required: 'Employee name is required.',

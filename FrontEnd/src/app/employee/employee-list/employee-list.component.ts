@@ -80,7 +80,6 @@ export class EmployeeListComponent implements OnInit {
   }
 
    loadEmployeesViaStore  () {
-
     this.employeeService.getEmployees().subscribe((employees) => 
     this.store.dispatch(new GetAllEmployeesSuccess( employees )));
    }
