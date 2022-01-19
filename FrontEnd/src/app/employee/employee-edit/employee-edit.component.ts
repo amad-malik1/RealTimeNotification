@@ -4,6 +4,9 @@ import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Employee } from '../employee';
 import { EmployeeService } from '../employee.service';
+import { AppState } from 'src/app/app.state';
+import { Store } from '@ngrx/store';
+import { AddEmployee, GetAllEmployeesSuccess, GetEmployee, GetEmployeeSuccess, UpdateEmployee, UpdateEmployeeSuccess, UPDATE_EMPLOYEE_SUCCESS } from '../store/employees.actions';
 
 @Component({
   selector: 'app-employee-edit',
@@ -26,7 +29,8 @@ export class EmployeeEditComponent implements OnInit, OnDestroy {
   constructor(private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private employeeService: EmployeeService) {
+    private employeeService: EmployeeService,
+     private store: Store<AppState>,) {
 
     this.validationMessages = {
       name: {
@@ -69,9 +73,12 @@ export class EmployeeEditComponent implements OnInit, OnDestroy {
   }
 
   getEmployee(id: string): void {
+    this.store.dispatch(new GetEmployee( id ));
     this.employeeService.getEmployee(id)
       .subscribe(
-        (employee: Employee) => this.displayEmployee(employee),
+        (employee: Employee) => {this.displayEmployee(employee);
+          // this.store.dispatch(new GetEmployeeSuccess( employee ));
+        },
         (error: any) => this.errorMessage = <any>error
       );
   }
@@ -115,15 +122,19 @@ export class EmployeeEditComponent implements OnInit, OnDestroy {
       if (this.employeeForm.dirty) {
         const p = { ...this.employee, ...this.employeeForm.value };
         if (p.id === '0') {
+          this.store.dispatch(new AddEmployee(p ));
           this.employeeService.createEmployee(p)
             .subscribe(
               () => this.onSaveComplete(),
               (error: any) => this.errorMessage = <any>error
             );
         } else {
+          this.store.dispatch(new UpdateEmployee(p ));
           this.employeeService.updateEmployee(p)
             .subscribe(
-              () => this.onSaveComplete(),
+              (emp) =>{
+              //  this.store.dispatch(new UpdateEmployeeSuccess(  ));
+                this.onSaveComplete();},
               (error: any) => this.errorMessage = <any>error
             );
         }

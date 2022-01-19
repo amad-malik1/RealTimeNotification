@@ -128,9 +128,19 @@ export function reducer(state = initialState, action: AppAction): State {
       };
     case employeeActions.UPDATE_EMPLOYEE_SUCCESS:
       {
+        // if(state.selected==null)
+        // return {
+        //   ...state,
+        //   ...state.data,
+        //   done: true,
+        //   selected: null,
+        //   error: null
+        // };
         const index = state
           .data
           .findIndex(h => h.id === state.selected.id);
+      
+
         if (index >= 0) {
           const data = [
             ...state.data.slice(0, index),
@@ -195,11 +205,12 @@ export function reducer(state = initialState, action: AppAction): State {
  * SELECTORS
  ************************/
 export const getEmployeesState = createFeatureSelector < State > ('employees');
-export const getAllEmployees = createSelector(getEmployeesState, (state: State) => state.data);
+export const getAllEmployees = createSelector(getEmployeesState, (state: State) => {
+  console.log("getAllEmployees reducer called");
+  // alert(state.data);
+ return state.data;});
 export const getEmployee = createSelector(getEmployeesState, (state: State) => {
-  debugger;
   if (state.action === employeeActions.GET_EMPLOYEES && state.done) {
-    debugger;
     return state.selected;
   } else {
     return null;
@@ -211,7 +222,8 @@ export const isDeleted = createSelector(getEmployeesState, (state: State) =>
 export const isCreated = createSelector(getEmployeesState, (state: State) =>
  state.action === employeeActions.CREATE_EMPLOYEE && state.done && !state.error);
 export const isUpdated = createSelector(getEmployeesState, (state: State) =>
- state.action === employeeActions.UPDATE_EMPLOYEE && state.done && !state.error);
+{
+  return (state.action === employeeActions.UPDATE_EMPLOYEE && state.done && !state.error);});
 
 export const getDeleteError = createSelector(getEmployeesState, (state: State) => {
   return state.action === employeeActions.DELETE_EMPLOYEE

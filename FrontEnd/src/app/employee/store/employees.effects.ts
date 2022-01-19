@@ -31,7 +31,7 @@ export class EmployeeEffects {
   getAllEmployees$: Observable<Action> = this.actions$.pipe(
     ofType(employeeActions.GET_EMPLOYEES),
     switchMap(() => this.svc.getEmployees()),
-    map((heroes) => new GetAllEmployeesSuccess(heroes)),
+    map((emps) => new GetAllEmployeesSuccess(emps)),
     catchError((err) => [new GetAllEmployeesError(err)])
   );
 
@@ -39,8 +39,8 @@ export class EmployeeEffects {
   getEmployee$ = this.actions$.pipe(
     ofType(employeeActions.GET_EMPLOYEES),
     map((action: GetEmployee) => action.payload),
-    // switchMap((id) => this.svc.getEmployee(id)),
-    // map((hero) => new GetEmployeeSuccess(hero)),
+    switchMap((id) => this.svc.getEmployee(id)),
+    map((emp) => new GetEmployeeSuccess(emp)),
     catchError((err) => [new GetEmployeeError(err)])
   );
 
@@ -48,7 +48,7 @@ export class EmployeeEffects {
   updateEmployee$ = this.actions$.pipe(
     ofType(employeeActions.UPDATE_EMPLOYEE),
     map((action: UpdateEmployee) => action.payload),
-    switchMap((game) => this.svc.updateEmployee(game)),
+    switchMap((emp) => this.svc.updateEmployee(emp)),
     map(() => new UpdateEmployeeSuccess()),
     catchError((err) => [new UpdateEmployeeError(err)])
   );
@@ -58,7 +58,7 @@ export class EmployeeEffects {
     ofType(employeeActions.CREATE_EMPLOYEE),
     map((action: AddEmployee) => action.payload),
     switchMap((newGame) => this.svc.createEmployee(newGame)),
-    // map((response) => new AddEmployeeSuccess(response.id)),
+    map((response) => new AddEmployeeSuccess(response.id)),
     catchError((err) => [new AddEmployeeError(err)])
   );
 

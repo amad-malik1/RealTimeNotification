@@ -11,9 +11,10 @@ import {
   isDeleted,
 } from '../store/employees.reducers';
 import { Observable } from 'rxjs';
-import { GetAllEmployees } from '../store/employees.actions';
+import { GetAllEmployees, GetAllEmployeesSuccess } from '../store/employees.actions';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EmployeeEditComponent } from '../employee-edit/employee-edit.component';
+
 @Component({
   selector: 'app-employee-list',
   templateUrl: './employee-list.component.html',
@@ -23,8 +24,7 @@ export class EmployeeListComponent implements OnInit {
   pageTitle = 'Employee List';
   filteredEmployees: Employee[]=[];
 
-  //employees: Observable<Employee[]>;
-  employees: Employee[]=[];
+  employees: Observable<Employee[]>;
 
   errorMessage = '';
   modalReference: NgbModalRef;
@@ -35,25 +35,26 @@ export class EmployeeListComponent implements OnInit {
   }
   set listFilter(value: string) {
     this._listFilter = value;
-     this.filteredEmployees = this.listFilter ? this.performFilter(this.listFilter) : this.employees;
+    //  this.filteredEmployees = this.listFilter ? this.performFilter(this.listFilter) : this.employees;
   }
 
   constructor(
     private employeeService: EmployeeService,
-    private store: Store<any>,
+    private store: Store<AppState>,
     private modalService: NgbModal
   ) {
-    // store.subscribe(data => {
-    //   debugger
-    //   (this.filteredEmployeess = data.items);
-    // }
-    //   );
-
+    this.employees = this.store.select(getAllEmployees);
   }
 
   ngOnInit(): void {
-    // this.loadEmployees();
-    this.getemployeedata();
+     this.loadEmployeesViaStore();
+     this.registerSinalR();
+  }
+
+
+  registerSinalR()
+  {
+
     const connection = new signalR.HubConnectionBuilder()
       .configureLogging(signalR.LogLevel.Information)
       .withUrl(environment.baseUrl + 'notify')
@@ -69,8 +70,7 @@ export class EmployeeListComponent implements OnInit {
       });
 
     connection.on("BroadcastMessage", () => {
-      // this.loadEmployees();
-      this.getemployeedata();
+      this.loadEmployeesViaStore();
     });
   }
   loadingError(error) {
@@ -79,23 +79,10 @@ export class EmployeeListComponent implements OnInit {
     }
   }
 
-   performFilter(filterBy: string): Employee[] {
-     filterBy = filterBy.toLocaleLowerCase();
-     return this.employees.filter((employee: Employee) =>
-       employee.name.toLocaleLowerCase().indexOf(filterBy) !== -1);
-   }
+   loadEmployeesViaStore  () {
 
-   loadEmployees  () {
-    this.store.dispatch(new GetAllEmployees());
-     this.store.select(getAllEmployees).subscribe(data => {
-       debugger
-      this.filteredEmployees = data;
-    }
-      );
-
-    
-    ;
-
+    this.employeeService.getEmployees().subscribe((employees) => 
+    this.store.dispatch(new GetAllEmployeesSuccess( employees )));
    }
   OpenaddEmployeeModel() {
     const modalRef = this.modalService.open(EmployeeEditComponent, { size: 'xl' });
@@ -112,13 +99,4 @@ export class EmployeeListComponent implements OnInit {
     return `with: ${reason}`;
   }
   
-   getemployeedata() {
-     this.employeeService.getEmployees().subscribe(
-       employees => {
-         this.employees = employees;
-         this.filteredEmployees = this.employees;
-       },
-       error => this.errorMessage = <any>error
-    );
-   }
 }

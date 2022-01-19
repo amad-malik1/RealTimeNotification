@@ -48,7 +48,7 @@ export class GetAllEmployeesError implements Action {
 export class GetEmployee implements Action {
   readonly type = GET_EMPLOYEE;
 
-  constructor(public payload: number) {
+  constructor(public payload: string) {
   }
 }
 
@@ -79,7 +79,7 @@ export class AddEmployee implements Action {
 export class AddEmployeeSuccess implements Action {
   readonly type = CREATE_EMPLOYEE_SUCCESS;
 
-  constructor(public payload: number) {
+  constructor(public payload: string) {
   }
 }
 
@@ -96,7 +96,7 @@ export class AddEmployeeError implements Action {
 export class RemoveEmployee implements Action {
   readonly type = DELETE_EMPLOYEE;
 
-  constructor(public payload: number) {
+  constructor(public payload: string) {
   }
 }
 
@@ -126,6 +126,8 @@ export class UpdateEmployee implements Action {
 
 export class UpdateEmployeeSuccess implements Action {
   readonly type = UPDATE_EMPLOYEE_SUCCESS;
+  // constructor(public payload: Employee) {
+  // }
 }
 
 export class UpdateEmployeeError implements Action {

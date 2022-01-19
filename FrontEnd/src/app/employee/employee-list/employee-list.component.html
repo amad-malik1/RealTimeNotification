@@ -34,7 +34,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let employee of filteredEmployees">
+                    <tr *ngFor="let employee of employees | async">
                         <td>
                             <a [routerLink]="['/employees', employee.id]">
                                 {{ employee.name }}
@@ -51,10 +51,6 @@
                             </button>
                         </td>
                         <td>
-                            <button class="btn btn-outline-warning btn-sm"
-                                (click)="deleteEmployee(employee.id,employee.name);">
-                                Delete
-                            </button>
                         </td>
                     </tr>
                 </tbody>
